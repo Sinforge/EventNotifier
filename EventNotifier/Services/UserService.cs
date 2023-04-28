@@ -13,9 +13,9 @@ namespace EventNotifier.Services
             _userRepo = userRepo;
             _mapper = mapper;
         }
-        public bool CheckUserdata(string username, string password)
+        public bool CheckUserdata(string email, string password)
         {
-            throw new NotImplementedException();
+            return _userRepo.GetUserByEmail(email)?.Password == password;
         }
 
         public bool RegisterUser(CreateUserDTO createUserDTO)
