@@ -10,7 +10,7 @@ namespace EventNotifier.Repositories
         public User? GetUserById(int userId);
         public User? GetUserByEmail(string email);
         public User? GetUserByEmailAndPassword(string email, string password);
-        public void ConfirmEmail(int userId);
+        public bool ConfirmEmail(string guid);
         public void DeleteUser(int userId);
 
         public void SubscribeToEvent(User user, Event @event);

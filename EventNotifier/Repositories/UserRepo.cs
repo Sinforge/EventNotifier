@@ -13,13 +13,17 @@ namespace EventNotifier.Repositories
         }
 
 
-        public void ConfirmEmail(int userId)
+        public bool ConfirmEmail(string guid)
         {
-            User? user = GetUserById(userId);
+            User? user = _context.Users.FirstOrDefault(u => u.ConfirmCode == guid);
             if (user != null) {
                 user.EmailConfirmed = true;
+                user.ConfirmCode = null;
                 _context.SaveChanges();
+                return true;
             }
+            return false;
+            
         }
 
         public void CreateUser(User user)

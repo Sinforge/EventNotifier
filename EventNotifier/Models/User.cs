@@ -14,6 +14,8 @@ namespace EventNotifier.Models
         public string Password { get; set; } = null!;
 
         public Role Role { get; set; } = Role.DefaultUser;
+
+        public string? ConfirmCode { get; set; } = null!;
         public bool EmailConfirmed { get; set; } = false;
 
         public ICollection<Event> EventSubscriptions { get; set; } = new List<Event> ();

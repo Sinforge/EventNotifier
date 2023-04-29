@@ -27,10 +27,10 @@ namespace EventNotifier.Services
             // send email
             using (var smtp = new SmtpClient())
             {
-                await smtp.ConnectAsync(_options.Value.SmtpHost, _options.Value.SmtpPort, SecureSocketOptions.StartTls);
-                await smtp.AuthenticateAsync(_options.Value.Username, _options.Value.Password);
-                await smtp.SendAsync(email);
-                await smtp.DisconnectAsync(true);
+               await smtp.ConnectAsync(_options.Value.SmtpHost, _options.Value.SmtpPort, SecureSocketOptions.StartTls);
+               await smtp.AuthenticateAsync(_options.Value.Username, _options.Value.Password);
+               await smtp.SendAsync(email);
+               await smtp.DisconnectAsync(true);
             }
         }
     }

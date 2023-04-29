@@ -16,25 +16,36 @@ namespace EventNotifier.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IOptions<Audience> _settings;
-        public UserController(ILogger<UserController> logger, IUserService userService, IOptions<Audience> settings) {
+        private readonly IEmailService _emailService;
+        public UserController(ILogger<UserController> logger, IUserService userService, IOptions<Audience> settings, IEmailService emailService) {
             _logger = logger;
             _settings = settings;
+            _emailService = emailService;
             _userService = userService;
         }
 
         [Route("/registration")]
         [HttpPost]
-        public ActionResult Registration([FromBody] CreateUserDTO userCreateDTO)
+        public async Task<IActionResult> Registration([FromBody] CreateUserDTO userCreateDTO)
         {
             _logger.LogTrace("Try to create new user");
-            if(!_userService.RegisterUser(userCreateDTO))
+            bool isSuccessful = await _userService.RegisterUser(userCreateDTO);
+            if (!isSuccessful)
             {
                 return BadRequest("User with such email exist.Email must be unique");
             }
-
             return StatusCode(201, "We send message to your email to confirm your account.");
         }
 
+        [Route("/confirm/{guid}")]
+        [HttpGet]
+        public IActionResult ConfirmEmail([FromRoute] string guid) {
+            if(_userService.ConfirmEmail(guid))
+            {
+                return Ok("Email succesful confirmed");
+            }
+            return BadRequest("Incorrect request or email already confirmed");
+        }
         [HttpGet("/login")]
         public async Task<ActionResult> Login(string email, string password)
         {
