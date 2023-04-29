@@ -2,6 +2,10 @@
 using EventNotifier.DTOs;
 using EventNotifier.Models;
 using EventNotifier.Repositories;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using MimeKit.Text;
 
 namespace EventNotifier.Services
 {
@@ -29,6 +33,5 @@ namespace EventNotifier.Services
             return true;
         }
 
-        
     }
 }

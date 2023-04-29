@@ -7,5 +7,6 @@ namespace EventNotifier.Services
     {
         public bool RegisterUser(CreateUserDTO createUserDTO);
         public User? CheckUserdata(string username, string password);
+
     }
 }

@@ -27,6 +27,7 @@ namespace EventNotifier.Controllers
             
             if(_eventService.CreateEvent(createEventDTO))
             {
+
                 return StatusCode(201);
             }
             return BadRequest("Something is going wrong");

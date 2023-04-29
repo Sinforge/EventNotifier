@@ -73,5 +73,6 @@ _[Ss]cripts
 *.nupkg
 *.ncrunchsolution
 *.dot[Cc]over
-
+**/appsetting.json
 .vs
+EventNotifier/appsettings.json

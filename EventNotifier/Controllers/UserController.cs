@@ -31,7 +31,8 @@ namespace EventNotifier.Controllers
             {
                 return BadRequest("User with such email exist.Email must be unique");
             }
-            return StatusCode(201);
+
+            return StatusCode(201, "We send message to your email to confirm your account.");
         }
 
         [HttpGet("/login")]
