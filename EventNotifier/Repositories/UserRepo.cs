@@ -43,12 +43,17 @@ namespace EventNotifier.Repositories
             return _context.Users.FirstOrDefault(x => x.Email == email);
         }
 
+        public User? GetUserByEmailAndPassword(string email, string password)
+        {
+            return _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
+        }
+
         public User? GetUserById(int userId)
         {
             return _context.Users.FirstOrDefault(u => u.Id == userId);
         }
 
-        public void SubscribeToEvent(int userId)
+        public void SubscribeToEvent(User user, Event @event)
         {
             throw new NotImplementedException();
         }

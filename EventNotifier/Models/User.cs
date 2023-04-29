@@ -13,8 +13,11 @@ namespace EventNotifier.Models
         [Required] 
         public string Password { get; set; } = null!;
 
-        public Role role { get; set; } = Role.DefaultUser;
+        public Role Role { get; set; } = Role.DefaultUser;
         public bool EmailConfirmed { get; set; } = false;
+
+        public ICollection<Event> EventSubscriptions { get; set; } = new List<Event> ();
+
 
 
     }

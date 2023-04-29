@@ -37,14 +37,19 @@ namespace EventNotifier.Controllers
         [HttpGet("/login")]
         public async Task<ActionResult> Login(string email, string password)
         {
-            bool isCorrect = _userService.CheckUserdata(email, password);
+            User? user = _userService.CheckUserdata(email, password);
+            bool isCorrect = user != null;
+            _logger.LogInformation("Checking user auth data");
             if (isCorrect)
             {
+                _logger.LogInformation("User data is correct");
+
                 // Set users claims
+                _logger.LogInformation($"User has role : {user.Role.ToString()}");
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, email),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, Role.DefaultUser.ToString())
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.ToString())
                 };
 
                 // Create signing key
@@ -68,7 +73,7 @@ namespace EventNotifier.Controllers
                     audience: _settings.Value.Aud,
                     claims: claims,
                     notBefore: DateTime.Now,
-                    expires: DateTime.Now.Add(TimeSpan.FromMinutes(2)),
+                    expires: DateTime.Now.Add(TimeSpan.FromHours(3)),
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                 );
 
@@ -77,12 +82,14 @@ namespace EventNotifier.Controllers
                 var response = new
                 {
                     access_token = encodedJWT,
-                    expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds
+                    expires_in = (int)TimeSpan.FromHours(3).TotalSeconds
                 };
+                _logger.LogTrace($"Create jwt token: {encodedJWT}");
                 return Json(response);
             }
             else
             {
+                _logger.LogInformation("Incorrect user data");
                 return BadRequest("Incorrect user data");
             }
 
