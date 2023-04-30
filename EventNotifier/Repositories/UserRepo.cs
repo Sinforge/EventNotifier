@@ -42,6 +42,11 @@ namespace EventNotifier.Repositories
             }
         }
 
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _context.Users.ToList();
+        }
+
         public User? GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefault(x => x.Email == email);

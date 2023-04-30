@@ -1,5 +1,6 @@
 ﻿using EventNotifier.Data;
 using EventNotifier.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EventNotifier.Repositories
@@ -23,7 +24,7 @@ namespace EventNotifier.Repositories
 
         public Event? GetEventById(int id)
         {
-            return _context.Events.FirstOrDefault(e => e.Id == id);
+            return _context.Events.Include(e => e.Subscribers).FirstOrDefault(e => e.Id == id);
         }
 
         public IEnumerable<Event> GetEvents()

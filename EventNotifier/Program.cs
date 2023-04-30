@@ -5,11 +5,17 @@ using EventNotifier.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHangfire(h => h.UseStorage(
+    new PostgreSqlStorage(builder.Configuration.GetConnectionString(name: "DefaultConnection"))));
+builder.Services.AddHangfireServer();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(option =>
@@ -40,8 +46,9 @@ builder.Services.AddScoped<IEventRepo, EventRepo>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-var app = builder.Build();
 
+var app = builder.Build();
+app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

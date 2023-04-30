@@ -33,6 +33,7 @@ namespace EventNotifier.Services
                await smtp.DisconnectAsync(true);
             }
         }
+
     }
 
 

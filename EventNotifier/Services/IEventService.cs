@@ -8,6 +8,8 @@ namespace EventNotifier.Services
         public bool CreateEvent(CreateEventDTO createEventDTO);
         public bool SubscribeToEvent(int eventId,  string userId);
 
+        public Task SendNotification(int eventId, string timeLeft);
+
         public IEnumerable<Event> GetAllEvents();
     }
 }

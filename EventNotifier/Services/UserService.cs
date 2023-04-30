@@ -38,6 +38,11 @@ namespace EventNotifier.Services
             return false;
         }
 
+        public IEnumerable<User> GetUsers()
+        {
+            return _userRepo.GetAllUsers();
+        }
+
         public async Task<bool> RegisterUser(CreateUserDTO createUserDTO)
         {
             User user = _mapper.Map<User>(createUserDTO);

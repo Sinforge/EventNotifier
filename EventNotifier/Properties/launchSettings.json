@@ -3,6 +3,7 @@
     "EventNotifier": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "dashboard",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

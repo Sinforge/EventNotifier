@@ -10,5 +10,7 @@ namespace EventNotifier.Services
 
         public bool ConfirmEmail(string guid);
 
+        public IEnumerable<User> GetUsers();
+
     }
 }
