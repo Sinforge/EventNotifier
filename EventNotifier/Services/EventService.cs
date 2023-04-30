@@ -61,6 +61,11 @@ namespace EventNotifier.Services
             return _eventRepo.GetEvents();
         }
 
+        public Event? GetEventById(int eventId)
+        {
+            return _eventRepo.GetEventById(eventId);
+        }
+
         public async Task SendEventInfo(int evenId,string name, string description)
         {
             var users = _userRepo.GetAllUsers();
@@ -100,6 +105,19 @@ namespace EventNotifier.Services
             }
             return false;
 
+        }
+
+        public bool UnsubscribeToEvent(int eventId, string email)
+        {
+            User? user = _userRepo.GetUserByEmail(email);
+            Event? @event = _eventRepo?.GetEventById(eventId);
+            if (@event != null && user != null)
+            {
+                @event.Subscribers.Remove(user);
+                _eventRepo.SaveChanges();
+                return true;
+            }
+            return false;
         }
     }
 }

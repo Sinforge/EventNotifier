@@ -12,5 +12,6 @@ namespace EventNotifier.Services
 
         public IEnumerable<User> GetUsers();
 
+
     }
 }

@@ -55,5 +55,24 @@ namespace EventNotifier.Controllers
             _logger.LogInformation("Events successful received");
             return Json(events);
         }
+
+        [Route("/event/{id}")]
+        [HttpGet]
+        public IActionResult GetEventById(int id)
+        {
+            return Json(_eventService.GetEventById(id));
+        }
+
+        [Route("/unsubscribe")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult UnsubscribeFromEvent(int eventId) {
+            string? email = HttpContext?.User?.Identity?.Name;
+            if (email != null && _eventService.UnsubscribeToEvent(eventId, email))
+            {
+                return Ok();
+            }
+            return BadRequest("The user did not follow this event or such event does not exist");
+        }
     }
 }
