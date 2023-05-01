@@ -13,8 +13,6 @@ namespace EventNotifier.Models
         [Required]
         public string Description { get; set; } = null!;
 
-        public long CurrentSubscribers { get; set; }
-
         public long? MaxSubscribers { get; set; }
 
         public ICollection<User> Subscribers { get; set; } = new List<User>();

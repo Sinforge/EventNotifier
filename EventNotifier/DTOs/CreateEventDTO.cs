@@ -9,6 +9,7 @@ namespace EventNotifier.DTOs
 
         public string Description { get; set; } = null!;
 
+        public long? MaxSubscribers { get; set; }
 
 
     }

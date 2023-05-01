@@ -97,7 +97,7 @@ namespace EventNotifier.Services
         {
             Event? @event = _eventRepo.GetEventById(eventId);
             User? user = _userRepo.GetUserByEmail(userEmail);
-            if (@event != null && user != null)
+            if (@event != null && user != null && @event.MaxSubscribers != 0 && @event.Subscribers.Count < @event.MaxSubscribers)
             {
                 @event.Subscribers.Add(user);
                 _eventRepo.SaveChanges();

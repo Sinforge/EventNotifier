@@ -3,7 +3,7 @@
     "EventNotifier": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "dashboard",
+      "launchUrl": "hangfire",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -20,7 +20,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/weatherforecast",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/hangfire",
       "publishAllPorts": true,
       "useSSL": true
     }
