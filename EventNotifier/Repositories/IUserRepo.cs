@@ -15,8 +15,6 @@ namespace EventNotifier.Repositories
 
         public IEnumerable<User> GetAllUsers();
 
-        public void SubscribeToEvent(User user, Event @event);
-        public void UnsubscribeToEvent(int userId);
 
     }
 }

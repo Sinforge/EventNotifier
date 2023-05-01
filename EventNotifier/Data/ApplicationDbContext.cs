@@ -12,7 +12,6 @@ namespace EventNotifier.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
         }
 
         
@@ -24,7 +23,7 @@ namespace EventNotifier.Data
                          new User
                          {
                              Id = 1,
-                             Email = "vlad.vlasov77@mail",
+                             Email = "vlad.vlasov77@mail.ru",
                              Password = "Aboba12345",
                              ConfirmCode = null,
                              EmailConfirmed = true,

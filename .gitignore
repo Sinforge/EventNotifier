@@ -76,3 +76,4 @@ _[Ss]cripts
 **/appsetting.json
 .vs
 EventNotifier/appsettings.json
+/EventNotifier/appsettings.Development.json

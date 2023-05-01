@@ -62,14 +62,6 @@ namespace EventNotifier.Repositories
             return _context.Users.FirstOrDefault(u => u.Id == userId);
         }
 
-        public void SubscribeToEvent(User user, Event @event)
-        {
-            throw new NotImplementedException();
-        }
 
-        public void UnsubscribeToEvent(int userId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

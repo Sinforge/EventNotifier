@@ -5,9 +5,9 @@ namespace EventNotifier.Services
 {
     public interface IEventService
     {
-        public bool CreateEvent(CreateEventDTO createEventDTO);
-        public bool SubscribeToEvent(int eventId,  string userId);
-        public bool UnsubscribeToEvent(int eventId, string email);
+        public void CreateEvent(CreateEventDTO createEventDTO);
+        public void SubscribeToEvent(int eventId,  string userId);
+        public void UnsubscribeToEvent(int eventId, string email);
 
         public Task SendNotification(int eventId, string timeLeft);
 
