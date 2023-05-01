@@ -29,7 +29,7 @@ namespace EventNotifier.Repositories
 
         public IEnumerable<Event> GetEvents()
         {
-            return _context.Events.ToList();
+            return _context.Events.Include(e => e.Subscribers).ToList();
         }
 
         public bool SaveChanges()

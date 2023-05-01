@@ -8,6 +8,8 @@ namespace EventNotifier.Profiles
     {
         public EventProfile() {
             CreateMap<CreateEventDTO, Event>();
+            CreateMap<Event, ReadEventDTO>()
+                .ForMember(dest => dest.CurrentSubscribers, opt => opt.MapFrom((src, dest, destMember, context) => src.Subscribers.Count));
         }
     }
 }

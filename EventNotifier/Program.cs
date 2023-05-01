@@ -7,6 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Hangfire.Dashboard;
+using Microsoft.Extensions.Configuration;
+using EventNotifier.Infrastructure.Filters;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,11 +53,22 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 var app = builder.Build();
-app.UseHangfireDashboard();
+
+//Fix auth for dashboard
+app.UseHangfireDashboard(
+/*options: new DashboardOptions
+{
+    Authorization = new[]
+        {
+        new HangfireAuthorizationFilter{ }
+        }
+}*/
+) ;
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 // Configure the HTTP request pipeline.
+
 app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller=User}/{action=Registration}");

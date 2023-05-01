@@ -86,7 +86,7 @@ namespace EventNotifier.Migrations
                         new
                         {
                             Id = 1,
-                            Email = "vlad.vlasov77@mail",
+                            Email = "vlad.vlasov77@mail.ru",
                             EmailConfirmed = true,
                             Password = "Aboba12345",
                             Role = 0,
