@@ -97,6 +97,7 @@ namespace EventNotifier.Controllers
                     expires_in = (int)TimeSpan.FromHours(3).TotalSeconds
                 };
                 _logger.LogTrace($"Create jwt token: {encodedJWT}");
+                HttpContext.Response.Cookies.Append("token", encodedJWT);
                 return Json(response);
             }
             else

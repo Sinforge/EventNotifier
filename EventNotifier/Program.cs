@@ -56,13 +56,13 @@ var app = builder.Build();
 
 //Fix auth for dashboard
 app.UseHangfireDashboard(
-/*options: new DashboardOptions
+options: new DashboardOptions
 {
     Authorization = new[]
         {
         new HangfireAuthorizationFilter{ }
         }
-}*/
+}
 ) ;
 app.UseHttpsRedirection();
 app.UseAuthentication();
