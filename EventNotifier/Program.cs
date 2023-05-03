@@ -16,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+Console.WriteLine(builder.Configuration.GetConnectionString(name: "DefaultConnection"));
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString(name: "DefaultConnection")));
 builder.Services.AddHangfire(h => h
@@ -53,7 +55,16 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
 
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}   
 //Fix auth for dashboard
 app.UseHangfireDashboard(
 options: new DashboardOptions

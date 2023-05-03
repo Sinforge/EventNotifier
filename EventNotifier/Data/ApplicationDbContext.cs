@@ -8,10 +8,10 @@ namespace EventNotifier.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
 
-        public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
         }
 
         
