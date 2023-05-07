@@ -1,4 +1,5 @@
 ﻿using EventNotifier.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventNotifier.Repositories
 {
@@ -8,6 +9,12 @@ namespace EventNotifier.Repositories
         public IEnumerable<Event> GetEvents();
         public Event? GetEventById(int id);
 
+        public void CreateNotification(Notification notification);
+        public void ChangeToComplete(Event @event);
         public bool SaveChanges();
+        public void ClearNotifications();
+        public List<Rating> GetRatingsBySameEvent(User user);
+       
+
     }
 }

@@ -7,7 +7,6 @@ namespace EventNotifier.Services
     {
         public Task<bool> RegisterUser(CreateUserDTO createUserDTO);
         public User? CheckUserdata(string username, string password);
-
         public bool ConfirmEmail(string guid);
 
         public IEnumerable<User> GetUsers();

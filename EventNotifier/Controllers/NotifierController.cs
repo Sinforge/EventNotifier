@@ -57,7 +57,32 @@ namespace EventNotifier.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Route("/rate-event")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult RateEvent(int eventId, byte ratingNumber) {
+            _logger.LogInformation("start to rating event");
+            string? email = HttpContext?.User?.Identity?.Name;
+            if(email  == null)
+            {
+                return BadRequest("User dont found");
+            }
+            if(ratingNumber > 10 || ratingNumber < 0)
+            {
+                return BadRequest("Rating number must be positive and less or equals then 10");
+            }
+            try
+            {
+                _eventService.RateEvent(eventId, ratingNumber, email);
+                return Ok("Event successful rated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        
 
+        }
         [Route("/all-events")]
         [HttpGet]
         public IActionResult GetAllEvents()
@@ -95,6 +120,28 @@ namespace EventNotifier.Controllers
                 }
             }
             return BadRequest("The user did not follow this event or such event does not exist");
+        }
+
+        [Route("/recommendations")]
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetRecommendations()
+        {
+            _logger.LogInformation("Start of making recommendations");
+            string? email = HttpContext?.User?.Identity?.Name;
+            if (email != null)
+            {
+                try
+                {
+                    var recommmendations =  _eventService.GetEventsRecommendation(email);
+                    return Json(recommmendations);
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            return BadRequest("User not found");
         }
     }
 }

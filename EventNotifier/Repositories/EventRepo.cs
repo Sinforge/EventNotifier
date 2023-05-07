@@ -15,6 +15,25 @@ namespace EventNotifier.Repositories
             _context = context;
         }
 
+        public void ChangeToComplete(Event @event)
+        {
+            @event.isCompleted = true;
+            _context.SaveChanges();
+        }
+
+        public void ClearNotifications()
+        {
+            foreach(var not in _context.Notifications)
+            {
+                if (not.IsChecked)
+                {
+                    _context.Notifications.Remove(not);
+                }
+             
+
+            }
+        }
+
         public bool CreateEvent(Event @event)
         {
             _context.Events.Add(@event);
@@ -22,19 +41,32 @@ namespace EventNotifier.Repositories
             return _context.SaveChanges() >= 0;
         }
 
+        public void CreateNotification(Notification notification)
+        {
+            _context.Notifications.Add(notification);
+        }
+
         public Event? GetEventById(int id)
         {
-            return _context.Events.Include(e => e.Subscribers).FirstOrDefault(e => e.Id == id);
+            return _context.Events.Include(e=> e.Ratings).Include(e => e.Subscribers).FirstOrDefault(e => e.Id == id);
         }
 
         public IEnumerable<Event> GetEvents()
         {
-            return _context.Events.Include(e => e.Subscribers).ToList();
+            return _context.Events.Include(e => e.Ratings).Include(e => e.Subscribers).ToList();
         }
 
         public bool SaveChanges()
         {
             return _context.SaveChanges() >= 0;
         }
+        public List<Rating> GetRatingsBySameEvent(User user)
+        {
+            var ratingWithUser = _context.Ratings.Include(r => r.Event).Select(r => r).Where(r => r.User == user).ToList();
+            var selectManyRatings = ratingWithUser.SelectMany(r => r.Event.Ratings).ToList();
+            var withOutUser = selectManyRatings.Where(r => r.User != user).ToList();
+            return withOutUser;
+        }
+
     }
 }

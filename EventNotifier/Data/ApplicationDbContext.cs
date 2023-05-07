@@ -7,7 +7,8 @@ namespace EventNotifier.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
-
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Notification> Notifications { get; set; }  
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -17,6 +18,9 @@ namespace EventNotifier.Data
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // For working with Location Types
+            modelBuilder.HasPostgresExtension("postgis");
+
             //Seed data
             modelBuilder.Entity<User>()
                         .HasData(

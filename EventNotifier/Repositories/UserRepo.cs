@@ -49,9 +49,9 @@ namespace EventNotifier.Repositories
 
         public User? GetUserByEmail(string email)
         {
-            return _context.Users.FirstOrDefault(x => x.Email == email);
+            return _context.Users.Include(u => u.Ratings).FirstOrDefault(x => x.Email == email);
         }
-
+  
         public User? GetUserByEmailAndPassword(string email, string password)
         {
             return _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password);

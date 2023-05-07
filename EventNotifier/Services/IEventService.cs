@@ -11,7 +11,10 @@ namespace EventNotifier.Services
 
         public Task SendNotification(int eventId, string timeLeft);
 
+        public void RateEvent(int eventId, byte ratingNumber, string userEmail);
         public Event? GetEventById(int eventId);
         public IEnumerable<Event> GetAllEvents();
+
+        public IEnumerable<Event> GetEventsRecommendation(string email);
     }
 }

@@ -14,13 +14,20 @@ namespace EventNotifier.Services
         private readonly IMapper _mapper;
         private readonly IUserRepo _userRepo;
         private readonly IEmailService _emailService;
-        public EventService(ILogger<EventService> logger, IEventRepo eventRepo, IMapper mapper, IUserRepo userRepo, IEmailService emailService)
+        private readonly IRecommendationService _recommendationService;
+        public EventService(ILogger<EventService> logger, IEventRepo eventRepo,
+            IMapper mapper, IUserRepo userRepo, IEmailService emailService,
+            IRecommendationService recommendationService)
         {
+            _recommendationService = recommendationService;
             _emailService = emailService;
             _userRepo = userRepo;
             _mapper = mapper;
             _logger = logger;
             _eventRepo = eventRepo;
+            // Clear notifications if users read them
+            RecurringJob.AddOrUpdate("clear_notification",
+                () => _eventRepo.ClearNotifications(), Cron.Daily);
         }
         public void CreateEvent(CreateEventDTO createEventDTO)
         {
@@ -54,6 +61,11 @@ namespace EventNotifier.Services
             BackgroundJob.Schedule(
                     () => SendNotification(@event.Id, "5 hours"),
                     timeLeft.Subtract(TimeSpan.FromHours(5)));
+            BackgroundJob.Schedule(
+                
+                       () => _eventRepo.ChangeToComplete(@event), 
+                       timeLeft.Add(TimeSpan.FromHours(5))
+                    );
 
         }
 
@@ -66,6 +78,23 @@ namespace EventNotifier.Services
         public Event? GetEventById(int eventId)
         {
             return _eventRepo.GetEventById(eventId);
+        }
+
+        public IEnumerable<Event> GetEventsRecommendation(string email)
+        {
+            return _recommendationService.GetRecommendation(_userRepo.GetUserByEmail(email));
+            
+        }
+
+        public void RateEvent(int eventId, byte ratingNumber, string userEmail)
+        {
+            Event @event = _eventRepo.GetEventById(eventId);
+            if (@event == null)
+            {
+                throw new ArgumentException("Event with such id dont found");
+            }
+            @event.Ratings.Add(new Rating { RatingNumber = ratingNumber, User = _userRepo.GetUserByEmail(userEmail), Event = @event });
+            _eventRepo.SaveChanges();
         }
 
         public async Task SendEventInfo(int evenId,string name, string description)
@@ -87,11 +116,15 @@ namespace EventNotifier.Services
             if (@event != null)
             {
                 var subscribers = @event?.Subscribers.ToList();
-                foreach(var sub in subscribers)
+                string message = $"This notification was created so that you do not forget about the event you are following. {@event.Name} starts in {timeLeft}";
+            
+                foreach (var sub in subscribers)
                 {
-                    await _emailService.SendMessageAsync(sub.Email, $"{@event.Name} starts in {timeLeft}",
-                        "This notification was created so that you do not forget about the event you are following.");
+                    Notification notification = new Notification { HtmlText = message, Receiver = sub };
+                    _eventRepo.CreateNotification(notification);
+                    await _emailService.SendMessageAsync(sub.Email, $"{@event.Name} starts in {timeLeft}", message);
                 }
+                _eventRepo.SaveChanges();
             }
         }
 

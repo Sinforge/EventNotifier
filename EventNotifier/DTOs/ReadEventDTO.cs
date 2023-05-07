@@ -12,6 +12,7 @@ namespace EventNotifier.DTOs
 
         public long? MaxSubscribers { get; set; }
 
+        public float AverageRating { get; set; }
         public long CurrentSubscribers { get; set; }
 
     }

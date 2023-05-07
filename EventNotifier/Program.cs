@@ -7,10 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Hangfire.Dashboard;
-using Microsoft.Extensions.Configuration;
 using EventNotifier.Infrastructure.Filters;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +16,13 @@ builder.Services.AddControllers();
 
 Console.WriteLine(builder.Configuration.GetConnectionString(name: "DefaultConnection"));
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseNpgsql(builder.Configuration.GetConnectionString(name: "DefaultConnection")));
+    options =>
+    {
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString(name: "DefaultConnection"),
+            serverOption => serverOption.UseNetTopologySuite());
+    }
+    );
 builder.Services.AddHangfire(h => h
     .UsePostgreSqlStorage(builder.Configuration.GetConnectionString(name: "DefaultConnection")));
 builder.Services.AddHangfireServer();
@@ -52,7 +55,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventRepo, EventRepo>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -65,7 +68,7 @@ using (var scope = app.Services.CreateScope())
         context.Database.Migrate();
     }
 }   
-//Fix auth for dashboard
+
 app.UseHangfireDashboard(
 options: new DashboardOptions
 {
