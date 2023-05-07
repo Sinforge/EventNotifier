@@ -29,10 +29,11 @@ namespace EventNotifier.Services
             return dotEvent / (norm1 * norm2);
         }
 
-        public IEnumerable<Event> GetRecommendation(User user)
+        public IEnumerable<int> GetRecommendation(User user)
         {
-            // Get all user not looked by user ratings
-            var allRatings = _eventRepo.GetRatingsBySameEvent(user);
+            // Get all user nt looked by user ratings
+            var allRatings =  user.Ratings.SelectMany(r => r.Event.Ratings)
+                                  .Where(r => r.User != user);
 
             // Take first 10 similarities of users ratings
             var similarities = allRatings.GroupBy(r => r.User)
@@ -53,7 +54,7 @@ namespace EventNotifier.Services
                                                    .Take(5);
                 recommendations.AddRange(recommendedEvents);
             }
-            return recommendations.Distinct();
+            return from recom in recommendations.Distinct() select recom.Id;
         }
     }
 }

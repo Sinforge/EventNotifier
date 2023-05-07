@@ -60,13 +60,13 @@ namespace EventNotifier.Repositories
         {
             return _context.SaveChanges() >= 0;
         }
-        public List<Rating> GetRatingsBySameEvent(User user)
+       /* public List<Rating> GetRatingsBySameEvent(User user)
         {
-            var ratingWithUser = _context.Ratings.Include(r => r.Event).Select(r => r).Where(r => r.User == user).ToList();
-            var selectManyRatings = ratingWithUser.SelectMany(r => r.Event.Ratings).ToList();
-            var withOutUser = selectManyRatings.Where(r => r.User != user).ToList();
-            return withOutUser;
+            return _context.Ratings.Include(r => r.User).Include(r => r.Event)
+                .Select(r => r)
+                .Where(r => r.User != user && user.Ratings.FirstOrDefault(rating => rating.Event.Id == r.Event.Id) != null).ToList();
         }
+       */
 
     }
 }

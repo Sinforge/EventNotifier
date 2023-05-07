@@ -18,9 +18,9 @@ namespace EventNotifier.Models
         public string? ConfirmCode { get; set; } = null!;
         public bool EmailConfirmed { get; set; } = false;
 
-        public ICollection<Event> EventSubscriptions { get; set; } = new List<Event> ();
-        public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public virtual ICollection<Event> EventSubscriptions { get; set; } = new List<Event> ();
+        public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
 
 

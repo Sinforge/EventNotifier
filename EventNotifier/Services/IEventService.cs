@@ -15,6 +15,6 @@ namespace EventNotifier.Services
         public Event? GetEventById(int eventId);
         public IEnumerable<Event> GetAllEvents();
 
-        public IEnumerable<Event> GetEventsRecommendation(string email);
+        public IEnumerable<int> GetEventsRecommendation(string email);
     }
 }

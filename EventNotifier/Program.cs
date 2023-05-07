@@ -18,7 +18,7 @@ Console.WriteLine(builder.Configuration.GetConnectionString(name: "DefaultConnec
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
     {
-        options.UseNpgsql(
+        options.UseLazyLoadingProxies().UseNpgsql(
             builder.Configuration.GetConnectionString(name: "DefaultConnection"),
             serverOption => serverOption.UseNetTopologySuite());
     }

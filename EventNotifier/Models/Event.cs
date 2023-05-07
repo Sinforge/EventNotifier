@@ -22,8 +22,8 @@ namespace EventNotifier.Models
 
 
         public bool isCompleted { get; set; } = false;
-        public ICollection<User> Subscribers { get; set; } = new List<User>();
-        public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+        public virtual ICollection<User> Subscribers { get; set; } = new List<User>();
+        public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
 
 

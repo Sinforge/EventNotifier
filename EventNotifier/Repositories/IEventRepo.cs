@@ -13,7 +13,7 @@ namespace EventNotifier.Repositories
         public void ChangeToComplete(Event @event);
         public bool SaveChanges();
         public void ClearNotifications();
-        public List<Rating> GetRatingsBySameEvent(User user);
+      //  public List<Rating> GetRatingsBySameEvent(User user);
        
 
     }

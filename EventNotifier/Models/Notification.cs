@@ -7,7 +7,7 @@ namespace EventNotifier.Models
         public int Id { get; set; }
         [Required]
         public string? HtmlText { get; set; }
-        public User Receiver { get; set; } = null!;
+        public virtual User Receiver { get; set; } = null!;
 
         public bool IsChecked { get; set; } = false;
     }

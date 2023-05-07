@@ -80,7 +80,7 @@ namespace EventNotifier.Services
             return _eventRepo.GetEventById(eventId);
         }
 
-        public IEnumerable<Event> GetEventsRecommendation(string email)
+        public IEnumerable<int> GetEventsRecommendation(string email)
         {
             return _recommendationService.GetRecommendation(_userRepo.GetUserByEmail(email));
             
