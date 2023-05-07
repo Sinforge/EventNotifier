@@ -8,11 +8,19 @@ using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
 using EventNotifier.Infrastructure.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using NetTopologySuite.Geometries;
+using NetTopologySuite;
+using NetTopologySuite.IO.Converters;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => {
+    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+});
+builder.Services.AddSingleton(NtsGeometryServices.Instance);
 
 Console.WriteLine(builder.Configuration.GetConnectionString(name: "DefaultConnection"));
 builder.Services.AddDbContext<ApplicationDbContext>(

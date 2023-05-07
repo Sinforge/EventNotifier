@@ -4,6 +4,7 @@ using EventNotifier.Models;
 using EventNotifier.Repositories;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 
 namespace EventNotifier.Services
 {
@@ -75,12 +76,17 @@ namespace EventNotifier.Services
             return _eventRepo.GetEvents();
         }
 
+        public IEnumerable<Event> GetEventByCoord(Coordinate coord, double distance)
+        {
+            return _eventRepo.GetEventsByCoords(coord, distance);
+        }
+
         public Event? GetEventById(int eventId)
         {
             return _eventRepo.GetEventById(eventId);
         }
 
-        public IEnumerable<int> GetEventsRecommendation(string email)
+        public IEnumerable<Event> GetEventsRecommendation(string email)
         {
             return _recommendationService.GetRecommendation(_userRepo.GetUserByEmail(email));
             

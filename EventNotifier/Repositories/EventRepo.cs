@@ -2,6 +2,7 @@
 using EventNotifier.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 
 namespace EventNotifier.Repositories
 {
@@ -56,17 +57,18 @@ namespace EventNotifier.Repositories
             return _context.Events.Include(e => e.Ratings).Include(e => e.Subscribers).ToList();
         }
 
+        public IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance)
+        {
+            var point = new Point(coord);
+            return from @event in _context.Events where @event.Point.Distance(point) <= distance select @event;
+        }
+
+
+
         public bool SaveChanges()
         {
             return _context.SaveChanges() >= 0;
         }
-       /* public List<Rating> GetRatingsBySameEvent(User user)
-        {
-            return _context.Ratings.Include(r => r.User).Include(r => r.Event)
-                .Select(r => r)
-                .Where(r => r.User != user && user.Ratings.FirstOrDefault(rating => rating.Event.Id == r.Event.Id) != null).ToList();
-        }
-       */
 
     }
 }

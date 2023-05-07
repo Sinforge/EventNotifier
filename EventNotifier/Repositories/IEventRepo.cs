@@ -1,5 +1,6 @@
 ﻿using EventNotifier.Models;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace EventNotifier.Repositories
 {
@@ -13,8 +14,9 @@ namespace EventNotifier.Repositories
         public void ChangeToComplete(Event @event);
         public bool SaveChanges();
         public void ClearNotifications();
-      //  public List<Rating> GetRatingsBySameEvent(User user);
-       
+        IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance);
+        //  public List<Rating> GetRatingsBySameEvent(User user);
+
 
     }
 }

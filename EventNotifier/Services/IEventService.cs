@@ -1,5 +1,6 @@
 ﻿using EventNotifier.DTOs;
 using EventNotifier.Models;
+using NetTopologySuite.Geometries;
 
 namespace EventNotifier.Services
 {
@@ -15,6 +16,7 @@ namespace EventNotifier.Services
         public Event? GetEventById(int eventId);
         public IEnumerable<Event> GetAllEvents();
 
-        public IEnumerable<int> GetEventsRecommendation(string email);
+        public IEnumerable<Event> GetEventsRecommendation(string email);
+        public IEnumerable<Event> GetEventByCoord(Coordinate coord, double distance);
     }
 }

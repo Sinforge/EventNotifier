@@ -29,7 +29,7 @@ namespace EventNotifier.Services
             return dotEvent / (norm1 * norm2);
         }
 
-        public IEnumerable<int> GetRecommendation(User user)
+        public IEnumerable<Event> GetRecommendation(User user)
         {
             // Get all user nt looked by user ratings
             var allRatings =  user.Ratings.SelectMany(r => r.Event.Ratings)
@@ -54,7 +54,7 @@ namespace EventNotifier.Services
                                                    .Take(5);
                 recommendations.AddRange(recommendedEvents);
             }
-            return from recom in recommendations.Distinct() select recom.Id;
+            return recommendations.Distinct() ;
         }
     }
 }

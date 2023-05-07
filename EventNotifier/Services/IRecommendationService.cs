@@ -7,6 +7,6 @@ namespace EventNotifier.Services
     {
         double ComputeSimilarity(User user1, User user2);
 
-        IEnumerable<int> GetRecommendation(User user);
+        IEnumerable<Event> GetRecommendation(User user);
     }
 }

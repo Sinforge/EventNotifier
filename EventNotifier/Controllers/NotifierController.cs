@@ -3,7 +3,11 @@ using EventNotifier.DTOs;
 using EventNotifier.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace EventNotifier.Controllers
 {
@@ -12,11 +16,16 @@ namespace EventNotifier.Controllers
         private readonly ILogger<NotifierController> _logger;
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
+        private readonly IOptions<JsonOptions> _jsonOptions;
+        private readonly NtsGeometryServices _ntsGeometryServices;
 
-        public NotifierController(ILogger<NotifierController> logger, IEventService eventService, IMapper mapper) {
+        public NotifierController(ILogger<NotifierController> logger, IEventService eventService, IMapper mapper,
+            IOptions<JsonOptions> jsonOptions, NtsGeometryServices geometryServices) {
             _eventService = eventService;
             _mapper = mapper;
             _logger = logger;
+            _ntsGeometryServices = geometryServices;
+            _jsonOptions = jsonOptions;
         }
 
 
@@ -83,6 +92,15 @@ namespace EventNotifier.Controllers
         
 
         }
+        [Route("/all-events-by-coord")]
+        [HttpGet]
+        public IActionResult GetEventsByCoord(Coordinate coord, int distance) {
+            _logger.LogInformation("Getting all event by coordinates");
+            var events = _eventService.GetEventByCoord(coord, distance);
+            _logger.LogInformation("Events succesful received");
+            return Json(from @event in events select _mapper.Map<ReadEventDTO>(@event));
+        }
+
         [Route("/all-events")]
         [HttpGet]
         public IActionResult GetAllEvents()
@@ -98,7 +116,8 @@ namespace EventNotifier.Controllers
         public IActionResult GetEventById(int id)
         {
             _logger.LogInformation($"Send event with id {id} data");
-            return Json(_mapper.Map<ReadEventDTO>(_eventService.GetEventById(id)));
+            var data = _mapper.Map<ReadEventDTO>(_eventService.GetEventById(id));
+            return Json(data);
         }
 
         [Route("/unsubscribe")]
@@ -134,7 +153,7 @@ namespace EventNotifier.Controllers
                 try
                 {
                     var recommmendations =  _eventService.GetEventsRecommendation(email);
-                    return Json(recommmendations);
+                    return Json(from @event in recommmendations select _mapper.Map<ReadEventDTO>(@event));
                 }
                 catch(Exception ex)
                 {
