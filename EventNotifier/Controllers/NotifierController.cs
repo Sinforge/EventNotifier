@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
-using System.Security.Claims;
-using System.Text.Json;
+
 
 namespace EventNotifier.Controllers
 {
@@ -16,18 +15,15 @@ namespace EventNotifier.Controllers
         private readonly ILogger<NotifierController> _logger;
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
-        private readonly IOptions<JsonOptions> _jsonOptions;
-        private readonly NtsGeometryServices _ntsGeometryServices;
+
 
         public NotifierController(ILogger<NotifierController> logger, IEventService eventService, IMapper mapper,
             IOptions<JsonOptions> jsonOptions, NtsGeometryServices geometryServices) {
             _eventService = eventService;
             _mapper = mapper;
             _logger = logger;
-            _ntsGeometryServices = geometryServices;
-            _jsonOptions = jsonOptions;
-        }
-
+     
+       }
 
         [Route("/create-event")]
         [HttpPost]
@@ -36,16 +32,16 @@ namespace EventNotifier.Controllers
         {
             _logger.LogInformation("Try to add event...");
             
-            try
-            {
+            //try
+            //{
                 _eventService.CreateEvent(createEventDTO);
                 return StatusCode(201);
-            }
-            catch (Exception ex)
+            
+            /*catch (Exception ex)
             {
                 return BadRequest(ex.Message);
 
-            }
+            }*/
 
         }
         [Route("/subscribe-to-event")]
@@ -94,12 +90,14 @@ namespace EventNotifier.Controllers
         }
         [Route("/all-events-by-coord")]
         [HttpGet]
-        public IActionResult GetEventsByCoord(Coordinate coord, int distance) {
+        public IActionResult GetEventsByCoord([FromBody] PointToSearch pointToSearch) {
             _logger.LogInformation("Getting all event by coordinates");
-            var events = _eventService.GetEventByCoord(coord, distance);
+            var coord = new Coordinate(pointToSearch.point.x, pointToSearch.point.y);
+            var events = _eventService.GetEventByCoord(coord, pointToSearch.distance);
             _logger.LogInformation("Events succesful received");
             return Json(from @event in events select _mapper.Map<ReadEventDTO>(@event));
         }
+
 
         [Route("/all-events")]
         [HttpGet]
@@ -163,4 +161,6 @@ namespace EventNotifier.Controllers
             return BadRequest("User not found");
         }
     }
+    [NonController]
+    public record PointToSearch(DTOs.Point point, double distance);
 }

@@ -11,7 +11,7 @@ namespace EventNotifier.Repositories
         public Event? GetEventById(int id);
 
         public void CreateNotification(Notification notification);
-        public void ChangeToComplete(Event @event);
+        public void ChangeToComplete(int @eventId);
         public bool SaveChanges();
         public void ClearNotifications();
         IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance);

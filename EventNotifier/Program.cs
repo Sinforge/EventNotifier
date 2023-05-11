@@ -8,17 +8,20 @@ using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
 using EventNotifier.Infrastructure.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NetTopologySuite.Geometries;
 using NetTopologySuite;
 using NetTopologySuite.IO.Converters;
-using Microsoft.Extensions.Options;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options => {
-    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+    options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
+});
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 builder.Services.AddSingleton(NtsGeometryServices.Instance);
 
@@ -66,17 +69,21 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     var context = services.GetRequiredService<ApplicationDbContext>();
     if (context.Database.GetPendingMigrations().Any())
     {
         context.Database.Migrate();
     }
 }   
-
 app.UseHangfireDashboard(
 options: new DashboardOptions
 {

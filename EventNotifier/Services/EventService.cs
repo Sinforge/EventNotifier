@@ -62,9 +62,9 @@ namespace EventNotifier.Services
             BackgroundJob.Schedule(
                     () => SendNotification(@event.Id, "5 hours"),
                     timeLeft.Subtract(TimeSpan.FromHours(5)));
+            
             BackgroundJob.Schedule(
-                
-                       () => _eventRepo.ChangeToComplete(@event), 
+                       () => _eventRepo.ChangeToComplete(@event.Id), 
                        timeLeft.Add(TimeSpan.FromHours(5))
                     );
 

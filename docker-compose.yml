@@ -19,7 +19,10 @@ services:
   db:
     container_name: db
     restart: always
-    image: postgres:latest
+    build:
+        dockerfile: Postgres/Dockerfile
+    volumes:
+        - ./Postgres/postgis_init.sql:/docker-entrypoint-initdb.d/postgis_init.sql
     networks: 
         - backend
     ports:

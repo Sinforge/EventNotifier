@@ -16,8 +16,9 @@ namespace EventNotifier.Repositories
             _context = context;
         }
 
-        public void ChangeToComplete(Event @event)
+        public void ChangeToComplete(int @eventId)
         {
+            var @event = _context.Events.FirstOrDefault(e => e.Id == @eventId);
             @event.isCompleted = true;
             _context.SaveChanges();
         }
@@ -49,18 +50,19 @@ namespace EventNotifier.Repositories
 
         public Event? GetEventById(int id)
         {
-            return _context.Events.Include(e=> e.Ratings).Include(e => e.Subscribers).FirstOrDefault(e => e.Id == id);
+            return _context.Events.FirstOrDefault(e => e.Id == id);
         }
 
         public IEnumerable<Event> GetEvents()
         {
-            return _context.Events.Include(e => e.Ratings).Include(e => e.Subscribers).ToList();
+            return _context.Events.ToList();
         }
 
         public IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance)
         {
             var point = new Point(coord);
-            return from @event in _context.Events where @event.Point.Distance(point) <= distance select @event;
+            var events = _context.Events.ToList();
+            return from @event in events where @event.Point.Distance(point) <= distance select @event;
         }
 
 
