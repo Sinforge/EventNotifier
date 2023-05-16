@@ -11,21 +11,23 @@ using System.Text;
 
 namespace EventNotifier.Controllers
 {
+    [ApiController]
+    [ResponseCache(CacheProfileName = "Default60")]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IOptions<Audience> _settings;
-        private readonly IEmailService _emailService;
-        public UserController(ILogger<UserController> logger, IUserService userService, IOptions<Audience> settings, IEmailService emailService) {
+        public UserController(ILogger<UserController> logger, IUserService userService, IOptions<Audience> settings) {
             _logger = logger;
             _settings = settings;
-            _emailService = emailService;
             _userService = userService;
         }
 
         [Route("/registration")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Registration([FromBody] CreateUserDTO userCreateDTO)
         {
             _logger.LogTrace("Try to create new user");
@@ -39,6 +41,8 @@ namespace EventNotifier.Controllers
 
         [Route("/confirm/{guid}")]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult ConfirmEmail([FromRoute] string guid) {
             if(_userService.ConfirmEmail(guid))
             {
@@ -47,7 +51,9 @@ namespace EventNotifier.Controllers
             return BadRequest("Incorrect request or email already confirmed");
         }
         [HttpGet("/login")]
-        public async Task<ActionResult> Login(string email, string password)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Login(string email, string password)
         {
             User? user = _userService.CheckUserdata(email, password);
             bool isCorrect = user != null;
@@ -97,7 +103,6 @@ namespace EventNotifier.Controllers
                     expires_in = (int)TimeSpan.FromHours(3).TotalSeconds
                 };
                 _logger.LogTrace($"Create jwt token: {encodedJWT}");
-                HttpContext.Response.Cookies.Append("token", encodedJWT);
                 return Json(response);
             }
             else

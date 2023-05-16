@@ -17,6 +17,8 @@ namespace EventNotifier.Repositories
         IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance);
         //  public List<Rating> GetRatingsBySameEvent(User user);
 
+        bool DeleteEvent(int eventId);
+
 
     }
 }

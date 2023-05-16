@@ -36,12 +36,18 @@ namespace EventNotifier.Services
 
             _logger.LogInformation("Creating event...");
 
-            bool isSuccessfulCreated = _eventRepo.CreateEvent(@event) ;
+            bool isSuccessfulCreated = _eventRepo.CreateEvent(@event);
+            InitScheduleTasks(@event);
+
+        }
+
+        private void InitScheduleTasks(Event @event)
+        {
             BackgroundJob.Enqueue(() => SendEventInfo(@event.Id, @event.Name, @event.Description));
             var timeLeft = @event.Date - DateTime.Now;
 
 
-            if ( timeLeft.TotalDays >= 30)
+            if (timeLeft.TotalDays >= 30)
             {
                 BackgroundJob.Schedule(
                     () => SendNotification(@event.Id, "month"),
@@ -49,9 +55,9 @@ namespace EventNotifier.Services
             }
             if (timeLeft.TotalDays >= 7)
             {
-                 BackgroundJob.Schedule(
-                    () => SendNotification(@event.Id, "week"),
-                    timeLeft.Subtract(TimeSpan.FromDays(7)));
+                BackgroundJob.Schedule(
+                   () => SendNotification(@event.Id, "week"),
+                   timeLeft.Subtract(TimeSpan.FromDays(7)));
             }
             if (timeLeft.TotalDays >= 1)
             {
@@ -62,14 +68,12 @@ namespace EventNotifier.Services
             BackgroundJob.Schedule(
                     () => SendNotification(@event.Id, "5 hours"),
                     timeLeft.Subtract(TimeSpan.FromHours(5)));
-            
+
             BackgroundJob.Schedule(
-                       () => _eventRepo.ChangeToComplete(@event.Id), 
+                       () => _eventRepo.ChangeToComplete(@event.Id),
                        timeLeft.Add(TimeSpan.FromHours(5))
                     );
-
         }
-
 
         public IEnumerable<Event> GetAllEvents()
         {
@@ -177,6 +181,48 @@ namespace EventNotifier.Services
             {
                 @event.Subscribers.Remove(user);
                 _eventRepo.SaveChanges();
+            }
+        }
+
+        public void DeleteEvent(int eventId)
+        {
+
+            //Delete events table
+            if (_eventRepo.DeleteEvent(eventId))
+            {
+
+
+                //Delete schedule jobs from hangfire
+                var monitor = JobStorage.Current.GetMonitoringApi();
+                var eventScheduledJobs = monitor.ScheduledJobs(0, int.MaxValue)
+                    .Where(x => (int)x.Value.Job.Args[0] == eventId);
+                foreach (var job in eventScheduledJobs)
+                {
+                    BackgroundJob.Delete(job.Key);
+                }
+            }
+            else
+            {
+                throw new Exception("Event with such id dont exist");
+            }
+        }
+
+        public void UpdateEvent(Event @event)
+        {
+            Event? eventInDb = _eventRepo.GetEventById(@event.Id);
+            if (eventInDb != null)
+            {
+                eventInDb.MaxSubscribers = @event.MaxSubscribers;
+                eventInDb.Point = @event.Point;
+                eventInDb.Category = @event.Category;
+                eventInDb.Date = @event.Date;  
+                eventInDb.Name = @event.Name;
+                eventInDb.Description = @event.Description;
+                _eventRepo.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("No event with such id");
             }
         }
     }

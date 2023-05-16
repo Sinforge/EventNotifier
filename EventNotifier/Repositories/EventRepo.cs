@@ -48,6 +48,18 @@ namespace EventNotifier.Repositories
             _context.Notifications.Add(notification);
         }
 
+        public bool DeleteEvent(int eventId)
+        {
+            bool eventIsExist = false;
+            Event @event = _context.Events.FirstOrDefault(e => e.Id == eventId);
+            if(@event != null) {
+                _context.Events.Remove(@event);
+                _context.SaveChanges();
+                eventIsExist = true;
+            }
+            return eventIsExist;
+        }
+
         public Event? GetEventById(int id)
         {
             return _context.Events.FirstOrDefault(e => e.Id == id);
@@ -61,7 +73,7 @@ namespace EventNotifier.Repositories
         public IEnumerable<Event> GetEventsByCoords(Coordinate coord, double distance)
         {
             var point = new Point(coord);
-            var events = _context.Events.ToList();
+            var events = this.GetEvents();
             return from @event in events where @event.Point.Distance(point) <= distance select @event;
         }
 

@@ -1,13 +1,7 @@
 ﻿using EventNotifier.Models;
 using Hangfire.Annotations;
 using Hangfire.Dashboard;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using System.Security.Claims;
 
 namespace EventNotifier.Infrastructure.Filters

@@ -14,6 +14,8 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options => {
     options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
@@ -38,7 +40,6 @@ builder.Services.AddHangfire(h => h
     .UsePostgreSqlStorage(builder.Configuration.GetConnectionString(name: "DefaultConnection")));
 builder.Services.AddHangfireServer();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(option =>
     {
@@ -100,10 +101,11 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "api/{controller=User}/{action=Registration}");
+    pattern: "/api/v1/{controller=User}/{action=Registration}");
 
 
 
 
 app.Run();
 
+public partial class Program { }
