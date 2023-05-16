@@ -13,13 +13,22 @@ using NetTopologySuite.IO.Converters;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(options => {
-    options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString(name: "RedisConnection");
+    options.InstanceName = "MyInstance";
+}); 
+builder.Services.AddResponseCaching();
+builder.Services.AddControllers(
+        opt => opt.CacheProfiles.Add(
+            "Default60", 
+            new Microsoft.AspNetCore.Mvc.CacheProfile(){Duration= 60}))
+    .AddJsonOptions(options => {
+       options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
 });
+
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

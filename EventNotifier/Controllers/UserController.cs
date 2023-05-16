@@ -12,7 +12,6 @@ using System.Text;
 namespace EventNotifier.Controllers
 {
     [ApiController]
-    [ResponseCache(CacheProfileName = "Default60")]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;

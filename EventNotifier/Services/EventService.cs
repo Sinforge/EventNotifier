@@ -3,8 +3,10 @@ using EventNotifier.DTOs;
 using EventNotifier.Models;
 using EventNotifier.Repositories;
 using Hangfire;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using System.Text.Json;
 
 namespace EventNotifier.Services
 {
@@ -16,15 +18,17 @@ namespace EventNotifier.Services
         private readonly IUserRepo _userRepo;
         private readonly IEmailService _emailService;
         private readonly IRecommendationService _recommendationService;
+        private readonly IDistributedCache _cache;
         public EventService(ILogger<EventService> logger, IEventRepo eventRepo,
             IMapper mapper, IUserRepo userRepo, IEmailService emailService,
-            IRecommendationService recommendationService)
+            IRecommendationService recommendationService, IDistributedCache cache)
         {
             _recommendationService = recommendationService;
             _emailService = emailService;
             _userRepo = userRepo;
             _mapper = mapper;
             _logger = logger;
+            _cache = cache;
             _eventRepo = eventRepo;
             // Clear notifications if users read them
             RecurringJob.AddOrUpdate("clear_notification",
@@ -78,6 +82,7 @@ namespace EventNotifier.Services
         public IEnumerable<Event> GetAllEvents()
         {
             return _eventRepo.GetEvents();
+
         }
 
         public IEnumerable<Event> GetEventByCoord(Coordinate coord, double distance)
@@ -88,6 +93,7 @@ namespace EventNotifier.Services
         public Event? GetEventById(int eventId)
         {
             return _eventRepo.GetEventById(eventId);
+
         }
 
         public IEnumerable<Event> GetEventsRecommendation(string email)
