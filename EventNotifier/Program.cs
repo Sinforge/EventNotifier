@@ -33,10 +33,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    options.CustomSchemaIds(type => type.ToString());
 });
 builder.Services.AddSingleton(NtsGeometryServices.Instance);
-
-Console.WriteLine(builder.Configuration.GetConnectionString(name: "DefaultConnection"));
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
     {
@@ -110,7 +109,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "/api/v1/{controller=User}/{action=Registration}");
+    pattern: "{controller=User}/{action=Registration}");
 
 
 

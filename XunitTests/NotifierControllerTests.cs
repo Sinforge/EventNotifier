@@ -22,6 +22,7 @@ using Xunit;
 using Hangfire.MemoryStorage;
 using EventNotifier.Profiles;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace XunitTests
 {
@@ -96,16 +97,16 @@ namespace XunitTests
 
 
         [Fact]
-        public void Get_AllEvent()
+        public async Task Get_AllEvent()
         {
            //Arrange
             Mock<IEventService> service = new();
             service.Setup(x => x.GetAllEvents()).Returns(massiveOfEvents);
             Mock<ILogger<NotifierController>> logger = new();
 
-            var notifierController = new NotifierController(logger.Object, service.Object, _mapper);
+            var notifierController = new NotifierController(logger.Object, service.Object, _mapper, null) ;
             //Act
-            var result = notifierController.GetAllEvents();
+            var result = await notifierController.GetAllEvents();
 
             //Assert
             Assert.NotNull(result);
@@ -126,18 +127,17 @@ namespace XunitTests
         }
 
         [Fact]
-        public void Get_EventByExistingId()
+        public async Task Get_EventByExistingId()
         {
             //Arrange
             Mock<IEventService> service = new();
             var timeNow = DateTime.Now;
             service.Setup(x => x.GetEventById(It.IsAny<int>())).Returns(() => new Event() { Id = 1, Category = "Aboa", Date = timeNow });
             Mock<ILogger<NotifierController>> logger = new();
-
-            var notifierController = new NotifierController(logger.Object, service.Object, _mapper);
+            var notifierController = new NotifierController(logger.Object, service.Object, _mapper, null);
 
             //Act
-            var result = notifierController.GetEventById(It.IsAny<int>());
+            var result = await notifierController.GetEventById(It.IsAny<int>());
 
             //Assert
             Assert.NotNull(result);
@@ -148,16 +148,17 @@ namespace XunitTests
         }
 
         [Fact]
-        public void Get_EventByNotExistingId()
+        public async Task Get_EventByNotExistingId()
         {
             //Arrange
             Mock<IEventService> service = new();
             service.Setup(x => x.GetEventById(It.IsAny<int>())).Returns(() => null);
             Mock<ILogger<NotifierController>> logger = new();
-            var notifierController = new NotifierController(logger.Object, service.Object, _mapper);
+          
+            var notifierController = new NotifierController(logger.Object, service.Object, _mapper, null);
 
             //Act
-            var result = notifierController.GetEventById(-1);
+            var result = await notifierController.GetEventById(-1);
             //Assert
             Assert.Null(result);
 
@@ -169,7 +170,7 @@ namespace XunitTests
             Mock<IEventService> service = new();
             service.Setup(x => x.CreateEvent(createEventDTO)).Verifiable();
             Mock<ILogger<NotifierController>> logger = new();
-            var notifierController = new NotifierController(logger.Object, service.Object, _mapper);
+            var notifierController = new NotifierController(logger.Object, service.Object, _mapper, null);
             //Act
             var result = notifierController.CreateEvent(createEventDTO) as IStatusCodeActionResult;
 
@@ -185,7 +186,7 @@ namespace XunitTests
             Mock<IEventService> service = new();
             service.Setup(x => x.CreateEvent(createEventDTO)).Throws(new Exception("Something wrong on server side"));
             Mock<ILogger<NotifierController>> logger = new();
-            var notifierController = new NotifierController(logger.Object, service.Object, _mapper);
+            var notifierController = new NotifierController(logger.Object, service.Object, _mapper, null);
             //Act
             var result = notifierController.CreateEvent(createEventDTO) as IStatusCodeActionResult;
 

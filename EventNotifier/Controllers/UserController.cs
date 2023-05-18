@@ -33,6 +33,7 @@ namespace EventNotifier.Controllers
             bool isSuccessful = await _userService.RegisterUser(userCreateDTO);
             if (!isSuccessful)
             {
+                _logger.LogWarning("User enter existing id");
                 return BadRequest("User with such email exist.Email must be unique");
             }
             return StatusCode(201, "We send message to your email to confirm your account.");
@@ -45,8 +46,10 @@ namespace EventNotifier.Controllers
         public IActionResult ConfirmEmail([FromRoute] string guid) {
             if(_userService.ConfirmEmail(guid))
             {
+                _logger.LogInformation("Confirming successful");
                 return Ok("Email succesful confirmed");
             }
+            _logger.LogWarning("Incorrect request or email already confirmed");
             return BadRequest("Incorrect request or email already confirmed");
         }
         [HttpGet("/login")]
@@ -106,7 +109,7 @@ namespace EventNotifier.Controllers
             }
             else
             {
-                _logger.LogInformation("Incorrect user data");
+                _logger.LogWarning("Incorrect user data");
                 return BadRequest("Incorrect user data");
             }
 

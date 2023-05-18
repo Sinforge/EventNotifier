@@ -46,6 +46,7 @@ namespace EventNotifier.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogWarning(ex.Message);
                 return BadRequest(ex.Message);
 
             }
@@ -66,6 +67,7 @@ namespace EventNotifier.Controllers
             }
             catch(Exception ex)
             {
+                _logger.LogWarning(ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -84,6 +86,7 @@ namespace EventNotifier.Controllers
             }
             catch(Exception ex)
             {
+                _logger.LogWarning(ex.Message);
                 return BadRequest(ex.Message);
             }
 
@@ -105,6 +108,7 @@ namespace EventNotifier.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogWarning(ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -155,7 +159,7 @@ namespace EventNotifier.Controllers
         public async Task<IEnumerable<ReadEventDTO>> GetAllEvents()
         {
             _logger.LogInformation("Getting all available events");
-            string? allEventString = await _cache.GetStringAsync("all");
+            string? allEventString = _cache != null ? await _cache.GetStringAsync("all") : null;
             if(allEventString != null)
             {
                 _logger.LogInformation("Send cached events");
@@ -164,10 +168,7 @@ namespace EventNotifier.Controllers
             var events = _eventService.GetAllEvents();
             _logger.LogInformation("Send nocached events");
             var readEvents = from @event in events select _mapper.Map<ReadEventDTO>(@event);
-            await _cache.SetStringAsync("all", JsonSerializer.Serialize(readEvents, _jsonSerializerOptions), new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            }) ;
+            if(_cache != null) await _cache.SetStringAsync("all", JsonSerializer.Serialize(readEvents, _jsonSerializerOptions), new DistributedCacheEntryOptions{  AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)}) ;
             return readEvents;
         }
 
@@ -178,7 +179,7 @@ namespace EventNotifier.Controllers
         public async Task<ReadEventDTO> GetEventById(int id)
         {
             _logger.LogInformation($"Send event with id {id} data");
-            string? eventString = await _cache.GetStringAsync(id.ToString());
+            string? eventString = _cache != null? await _cache.GetStringAsync(id.ToString()) : null;
             if(eventString != null)
             {
                 _logger.LogInformation($"Send cached event with id : {id}");
@@ -187,9 +188,9 @@ namespace EventNotifier.Controllers
 
             _logger.LogInformation($"Send nocached event with id : {id}");
             var data = _mapper.Map<ReadEventDTO>(_eventService.GetEventById(id));
-            await _cache.SetStringAsync(id.ToString(), JsonSerializer.Serialize(data, _jsonSerializerOptions), new DistributedCacheEntryOptions
+            if (_cache != null) await _cache.SetStringAsync(id.ToString(), JsonSerializer.Serialize(data, _jsonSerializerOptions), new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
             return data;
         }
@@ -212,9 +213,11 @@ namespace EventNotifier.Controllers
                 }
                 catch(Exception ex)
                 {
+                    _logger.LogWarning(ex.Message);
                     return BadRequest(ex.Message);
                 }
             }
+            _logger.LogWarning("The user did not follow this event or such event does not exist");
             return BadRequest("The user did not follow this event or such event does not exist");
         }
 
@@ -233,7 +236,7 @@ namespace EventNotifier.Controllers
             {
                 try
                 {
-                    string? recommendationString = await _cache.GetStringAsync(email);
+                    string? recommendationString = _cache != null ?await _cache.GetStringAsync(email) : null;
                     if(recommendationString != null)
                     {
                         _logger.LogInformation($"Send cached recommendations to user : {email}");
@@ -243,14 +246,15 @@ namespace EventNotifier.Controllers
                     var recommmendations =  _eventService.GetEventsRecommendation(email);
                     var recommendationsToRead = from @event in recommmendations
                                                 select _mapper.Map<ReadEventDTO>(@event);
-                    await _cache.SetStringAsync(email, JsonSerializer.Serialize(recommendationsToRead, _jsonSerializerOptions), new DistributedCacheEntryOptions
+                    if (_cache != null) await _cache.SetStringAsync(email, JsonSerializer.Serialize(recommendationsToRead, _jsonSerializerOptions), new DistributedCacheEntryOptions
                     {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    }) ;
                     return Json(recommendationsToRead);
                 }
                 catch(Exception ex)
                 {
+                    _logger.LogWarning(ex.Message);
                     return BadRequest(ex.Message);
                 }
             }
