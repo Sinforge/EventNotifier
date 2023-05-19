@@ -231,5 +231,10 @@ namespace EventNotifier.Services
                 throw new Exception("No event with such id");
             }
         }
+
+        public IEnumerable<Notification> GetUserNotifications(string email)
+        {
+            return _eventRepo.GetAllNotifications(email);
+        }
     }
 }

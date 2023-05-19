@@ -35,6 +35,8 @@ namespace EventNotifier.Controllers
         [Authorize(Roles= "Administration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult CreateEvent([FromBody] CreateEventDTO createEventDTO) 
         {
             _logger.LogInformation("Try to add event...");
@@ -57,6 +59,8 @@ namespace EventNotifier.Controllers
         [Authorize(Roles ="Administration")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult DeleteEvent(int eventId)
         {
             _logger.LogInformation("Try to delete event...");
@@ -76,6 +80,8 @@ namespace EventNotifier.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult UpdateEvent([FromBody] Event @event)
         {
             _logger.LogInformation("Try to update event...");
@@ -96,6 +102,7 @@ namespace EventNotifier.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult SubscribeToEvent(int event_id)
         {
             _logger.LogInformation("Try subscribe to event");
@@ -117,6 +124,7 @@ namespace EventNotifier.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult RateEvent(int eventId, byte ratingNumber) {
             _logger.LogInformation("start to rating event");
             string? email = HttpContext?.User?.Identity?.Name;
@@ -253,6 +261,44 @@ namespace EventNotifier.Controllers
                     return Json(recommendationsToRead);
                 }
                 catch(Exception ex)
+                {
+                    _logger.LogWarning(ex.Message);
+                    return BadRequest(ex.Message);
+                }
+            }
+            _logger.LogWarning("User not found");
+            return BadRequest("User not found");
+        }
+        [Route("/notifications")]
+        [HttpGet]
+        [Authorize]
+        [ResponseCache(CacheProfileName = "Default60")]
+        [ProducesResponseType(typeof(IEnumerable<Notification>), 200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<IEnumerable<string>>> GetUserNotifications()
+        {
+            _logger.LogInformation("Getting user notifications...");
+            string? email = HttpContext?.User?.Identity?.Name;
+            if (email != null)
+            {
+                try
+                {
+                    string? notificationsString = _cache != null ? await _cache.GetStringAsync(email + "_notifications") : null;
+                    if (notificationsString != null)
+                    {
+                        _logger.LogInformation($"Send cached notifications to user : {email}");
+                        return Json(JsonSerializer.Deserialize<IEnumerable<Notification>>(notificationsString, _jsonSerializerOptions));
+                    }
+                    _logger.LogInformation($"Send nocached notifications to user: {email}");
+                    var notifications = _eventService.GetUserNotifications(email);
+                    if (_cache != null) await _cache.SetStringAsync(email + "_notifications", JsonSerializer.Serialize(notificationsString, _jsonSerializerOptions), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    });
+                    return Json(notifications);
+                }
+                catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
                     return BadRequest(ex.Message);

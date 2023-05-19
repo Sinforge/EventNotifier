@@ -20,5 +20,7 @@ namespace EventNotifier.Services
         public IEnumerable<Event> GetEventByCoord(Coordinate coord, double distance);
         void DeleteEvent(int eventId);
         void UpdateEvent(Event @event);
+
+        IEnumerable<Notification> GetUserNotifications(string email);
     }
 }

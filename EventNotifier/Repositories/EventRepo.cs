@@ -60,6 +60,11 @@ namespace EventNotifier.Repositories
             return eventIsExist;
         }
 
+        public IEnumerable<Notification> GetAllNotifications(string email)
+        {
+            return from notification in _context.Notifications where notification.Receiver.Email == email select notification;
+        }
+
         public Event? GetEventById(int id)
         {
             return _context.Events.FirstOrDefault(e => e.Id == id);

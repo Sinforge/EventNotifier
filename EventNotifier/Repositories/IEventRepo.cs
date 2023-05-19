@@ -19,6 +19,7 @@ namespace EventNotifier.Repositories
 
         bool DeleteEvent(int eventId);
 
+        IEnumerable<Notification> GetAllNotifications(string email);
 
     }
 }
