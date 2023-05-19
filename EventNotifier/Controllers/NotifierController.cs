@@ -162,7 +162,7 @@ namespace EventNotifier.Controllers
 
         [Route("/all-events")]
         [HttpGet]
-        [ResponseCache(CacheProfileName = "Default60")]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(typeof(IEnumerable<ReadEventDTO>), 200)]
         public async Task<IEnumerable<ReadEventDTO>> GetAllEvents()
         {
@@ -176,13 +176,13 @@ namespace EventNotifier.Controllers
             var events = _eventService.GetAllEvents();
             _logger.LogInformation("Send nocached events");
             var readEvents = from @event in events select _mapper.Map<ReadEventDTO>(@event);
-            if(_cache != null) await _cache.SetStringAsync("all", JsonSerializer.Serialize(readEvents, _jsonSerializerOptions), new DistributedCacheEntryOptions{  AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)}) ;
+            if(_cache != null) await _cache.SetStringAsync("all", JsonSerializer.Serialize(readEvents, _jsonSerializerOptions), new DistributedCacheEntryOptions{  AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)}) ;
             return readEvents;
         }
 
         [Route("/event/{id}")]
         [HttpGet]
-        [ResponseCache(CacheProfileName = "Default60")]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(typeof(ReadEventDTO), 200)]
         public async Task<ReadEventDTO> GetEventById(int id)
         {
@@ -198,8 +198,8 @@ namespace EventNotifier.Controllers
             var data = _mapper.Map<ReadEventDTO>(_eventService.GetEventById(id));
             if (_cache != null) await _cache.SetStringAsync(id.ToString(), JsonSerializer.Serialize(data, _jsonSerializerOptions), new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
+            }) ;
             return data;
         }
 
@@ -232,7 +232,7 @@ namespace EventNotifier.Controllers
         [Route("/recommendations")]
         [HttpGet]
         [Authorize]
-        [ResponseCache(CacheProfileName = "Default60")]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(typeof(IEnumerable<ReadEventDTO>), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -256,7 +256,7 @@ namespace EventNotifier.Controllers
                                                 select _mapper.Map<ReadEventDTO>(@event);
                     if (_cache != null) await _cache.SetStringAsync(email, JsonSerializer.Serialize(recommendationsToRead, _jsonSerializerOptions), new DistributedCacheEntryOptions
                     {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
                     }) ;
                     return Json(recommendationsToRead);
                 }
@@ -272,7 +272,7 @@ namespace EventNotifier.Controllers
         [Route("/notifications")]
         [HttpGet]
         [Authorize]
-        [ResponseCache(CacheProfileName = "Default60")]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(typeof(IEnumerable<Notification>), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -294,7 +294,7 @@ namespace EventNotifier.Controllers
                     var notifications = _eventService.GetUserNotifications(email);
                     if (_cache != null) await _cache.SetStringAsync(email + "_notifications", JsonSerializer.Serialize(notificationsString, _jsonSerializerOptions), new DistributedCacheEntryOptions
                     {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
                     });
                     return Json(notifications);
                 }

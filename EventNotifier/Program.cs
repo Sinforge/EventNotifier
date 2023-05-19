@@ -23,8 +23,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddResponseCaching();
 builder.Services.AddControllers(
         opt => opt.CacheProfiles.Add(
-            "Default60", 
-            new Microsoft.AspNetCore.Mvc.CacheProfile(){Duration= 60}))
+            "Default30", 
+            new Microsoft.AspNetCore.Mvc.CacheProfile(){Duration= 30}))
     .AddJsonOptions(options => {
        options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
 });

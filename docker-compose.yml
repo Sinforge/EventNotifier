@@ -8,7 +8,7 @@ services:
       dockerfile: EventNotifier/Dockerfile
     environment:
         - ConnectionStrings__RedisConnection=redis
-        - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=EventNotifier;User Id=postgres;Password=QWEewq1010; #Extract to .env file later
+        - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}; 
     depends_on:
         - db
         - redis
@@ -16,7 +16,7 @@ services:
         - backend
 
     ports:
-        - "8080:80"
+        - "5146:80"
   db:
     container_name: db
     restart: always
@@ -30,9 +30,9 @@ services:
     ports:
         - "5432:5432"
     environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=QWEewq1010
-        - POSTGRES_DB=EventNotifier
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
   redis:
     image: redis
     volumes:
